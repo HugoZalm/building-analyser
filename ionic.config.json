@@ -1,0 +1,7 @@
+{
+  "name": "building-analyser",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
