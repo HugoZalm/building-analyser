@@ -45,8 +45,8 @@
                 "output": "./svg"
               }
             ],
-            "styles": ["src/theme/variables.scss", "src/global.scss"],
-            "scripts": [],
+            "styles": ["src/theme/variables.scss", "src/global.scss", "node_modules/cesium/Build/Cesium/Widgets/widgets.css"],
+            "scripts": ["node_modules/cesium/Build/Cesium/Cesium.js"],
             "customWebpackConfig": {
               "path": "./extra-webpack.config.js"
             }

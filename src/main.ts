@@ -11,6 +11,8 @@ if (environment.production) {
   enableProdMode();
 }
 
+(window as Record<string, any>)['CESIUM_BASE_URL'] = 'assets/cesium/';
+
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
