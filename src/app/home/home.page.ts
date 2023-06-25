@@ -1,6 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { Viewer, Label, SceneMode, Ion } from 'cesium';
+import { Viewer, Label, Ion, createOsmBuildingsAsync, Cartesian3, Math as CesiumMath, Terrain } from 'cesium';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -24,8 +24,18 @@ export class HomePage {
     const element = this.cesiumViewer.nativeElement;
     if (environment.cesiumAccessToken) {
       Ion.defaultAccessToken = environment.cesiumAccessToken;
-  }    setTimeout(() => {
+    }
+    setTimeout(async () => {
       this.viewer = this.createViewer(element);
+      const osmBuildingsTileset = await createOsmBuildingsAsync();
+      this.viewer.scene.primitives.add(osmBuildingsTileset);
+      this.viewer.scene.camera.flyTo({
+        destination: Cartesian3.fromDegrees(5.526, 51.765, 250),
+        orientation: {
+          heading: CesiumMath.toRadians(20),
+          pitch: CesiumMath.toRadians(-20),
+        },
+      }); 
     }, 10);
   }
 
@@ -48,7 +58,8 @@ export class HomePage {
       projectionPicker: false,
       // sceneMode: SceneMode.SCENE2D,
       shadows: false,
-      orderIndependentTranslucency: false
+      orderIndependentTranslucency: false,
+      terrain: Terrain.fromWorldTerrain(),
     });
   }
 }
