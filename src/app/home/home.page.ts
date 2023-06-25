@@ -1,6 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { Viewer, Label, SceneMode } from 'cesium';
+import { Viewer, Label, SceneMode, Ion } from 'cesium';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -20,13 +21,15 @@ export class HomePage {
   constructor() {}
 
   ngAfterViewInit(): void {
-    // const element = this.cesiumViewer.nativeElement;
-    setTimeout(() => {
-      this.viewer = this.createViewer('cesiumViewer');
+    const element = this.cesiumViewer.nativeElement;
+    if (environment.cesiumAccessToken) {
+      Ion.defaultAccessToken = environment.cesiumAccessToken;
+  }    setTimeout(() => {
+      this.viewer = this.createViewer(element);
     }, 10);
   }
 
-  private createViewer(element: string) { // HTMLDivElement): Viewer {
+  private createViewer(element: HTMLDivElement): Viewer {
     Label.enableRightToLeftDetection = true;
     return new Viewer(element, {
       fullscreenButton: false,
@@ -43,12 +46,11 @@ export class HomePage {
       animation: false,
       selectionIndicator: false,
       projectionPicker: false,
-      sceneMode: SceneMode.SCENE2D,
+      // sceneMode: SceneMode.SCENE2D,
       shadows: false,
       orderIndependentTranslucency: false
     });
   }
-
 }
 
 
