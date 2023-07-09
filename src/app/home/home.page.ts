@@ -1,6 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { Viewer, Label, Ion, createOsmBuildingsAsync, Cartesian3, Math as CesiumMath, Terrain } from 'cesium';
+import { Viewer, Label, Ion, createOsmBuildingsAsync, Cartesian3, Math as CesiumMath, Terrain, Color, ScreenSpaceEventHandler, Cesium3DTileFeature, ScreenSpaceEventType } from 'cesium';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -18,6 +18,12 @@ export class HomePage {
    * The main {Cesium.Viewer}
    */
   private viewer!: Viewer;
+
+  private selected = {
+    feature: undefined,
+    originalColor: new Color(),
+  };
+
   constructor() {}
 
   ngAfterViewInit(): void {
@@ -35,7 +41,8 @@ export class HomePage {
           heading: CesiumMath.toRadians(20),
           pitch: CesiumMath.toRadians(-20),
         },
-      }); 
+      });
+      this.setHandlers();
     }, 10);
   }
 
@@ -61,6 +68,44 @@ export class HomePage {
       orderIndependentTranslucency: false,
       terrain: Terrain.fromWorldTerrain(),
     });
+  }
+
+  private setHandlers() {
+    const highlighted: {
+      feature: Cesium3DTileFeature | undefined,
+      originalColor: Color,
+    } = {
+      feature: undefined,
+      originalColor: new Color(),
+    };
+  
+    // Color a feature yellow on hover.
+    this.viewer.screenSpaceEventHandler.setInputAction(
+      (movement: ScreenSpaceEventHandler.PositionedEvent) => {
+      // If a feature was previously highlighted, undo the highlight
+      if (highlighted.feature !== undefined) {
+        highlighted.feature.color = highlighted.originalColor;
+        highlighted.feature = undefined;
+      }
+      // Pick a new feature
+      const pickedFeature = this.viewer.scene.pick(movement.position);
+  
+      // Highlight the feature if it's not already selected.
+      if (pickedFeature !== this.selected.feature) {
+        highlighted.feature = pickedFeature;
+        Color.clone(
+          pickedFeature.color,
+          highlighted.originalColor
+        );
+        pickedFeature.color = Color.YELLOW;
+        this.changeInfo(pickedFeature);
+      }
+    },
+    ScreenSpaceEventType.LEFT_CLICK);
+  }
+
+  private changeInfo(pickedFeature: Cesium3DTileFeature) {
+    pickedFeature.getPropertyIds().forEach(id => console.log(id + ": " + pickedFeature.getProperty(id)));
   }
 }
 
